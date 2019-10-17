@@ -44,7 +44,10 @@ div.grid2 {
 }
 
 div.grid3 {
-	background-color: blue;
+	background-color: green;
+	animation-name: ani_grid3;
+	animation-duration: 4s;
+	animation-iteration-count: infinite;
 }
 
 div.grid4 {
@@ -64,6 +67,14 @@ div.grid4 {
 	60% {background-color: #6B4C7F;}
 	80% {background-color: #933CCC;}
 	100% {background-color: #D697FF;}
+}
+@keyframes ani_grid3 {
+	0% {background-color: #FFFF55;}
+	20% {background-color: #FCEF87;}
+	40% {background-color: #F5C342;}
+	60% {background-color: #F5BD42;}
+	80% {background-color: #F9DB49;}
+	100% {background-color: #FCEF87;}
 }
 
 .fas {
