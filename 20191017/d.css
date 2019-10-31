@@ -1,0 +1,15 @@
+div.container {
+ width: 840px;
+ height: 60px;
+ margin: 0px auto;
+}
+
+div.grid {
+ width: 100px;
+ height: 50px;
+ margin: 5px;
+ line-height: 50px;
+ box-shadow: 3px 3px 3px gray;
+ font-size: 10px;
+ display: inline-block;
+}
