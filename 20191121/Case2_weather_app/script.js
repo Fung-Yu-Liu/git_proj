@@ -11,24 +11,25 @@ $(document).ready(function() {
 	function getTaiwanWeather(city_name) {
 		//Weather Forecast Open Data API
 		var Your_Weather_API_key = "CWB-AE9E0C7F-6E03-47F6-9254-0C19C9334928";  //IMPORTANT, replace it with your weather API Authkey 中央氣象局授權碼
-		//中央氣象局 F-C0032-001 一般天氣預報-今明 36 小時天氣預報資料 API 全部縣市
-		var url_all = "https://opendata.cwb.gov.tw/api/v1/rest/datastore/F-C0032-001?Authorization=" + Your_Weather_API_key + "&format=JSON";
-		//中央氣象局 F-C0032-001 一般天氣預報-今明 36 小時天氣預報資料 API by 縣市
-		var url_city = "https://opendata.cwb.gov.tw/api/v1/rest/datastore/F-C0032-001?Authorization=" + Your_Weather_API_key + "&format=JSON&locationName=";
-				//中央氣象局 F-C0032-001 一般天氣預報-今明 36 小時天氣預報資料 API 全部縣市舒適度
-				//var url_CI = "https://opendata.cwb.gov.tw/api/v1/rest/datastore/F-C0032-001?Authorization=" + Your_Weather_API_key + "&format=JSON&elementName=CI&locationName=";
+		//中央氣象局 F-D0047-089 臺灣各縣市鄉鎮未來3天(72小時)逐3小時天氣預報
+		var url_all = "https://opendata.cwb.gov.tw/api/v1/rest/datastore/F-A0021-001?Authorization=" + Your_Weather_API_key + "&format=JSON";
+		//中央氣象局 F-D0047-089 臺灣各縣市鄉鎮未來3天(72小時)逐3小時天氣預報
+		var url_city = "https://opendata.cwb.gov.tw/api/v1/rest/datastore/F-A0021-001?Authorization=" + Your_Weather_API_key + "&format=JSON&locationName=";
+				//中央氣象局 F-D0047-0891 臺灣各縣市鄉鎮未來3天(72小時)逐3小時天氣預報
+				
 		
-		var jqxhr = $.getJSON(url_city + city_name, function() {
-			// console.log("Get Taiwan weather success.");
+		var jqxhr = $.getJSON(url_city, function() {
+			console.log("Get Taiwan weather success.");
 		})
 		
 		.done(function(arr) {
-			console.log("The second success.");
+			console.log(arr);
 			// var outStr = JSON.stringify(arr);
+			//降雨機率
+			var time_1 = arr.records.locations[0].location[0].locationName;
+			var time_2 = arr.records.locations[0].location[0].weatherElement[0].time[0].starttime;
+			var time_3 = arr.records.locations[0].location[0].weatherElement[0].time[1].elementValue[0].value;
 			
-			var time_1 = arr.records.location[0].weatherElement[0].time[0].startTime.substr(5,8).replace("-","/") + "時";
-			var time_2 = arr.records.location[0].weatherElement[0].time[1].startTime.substr(5,8).replace("-","/") + "時";
-			var time_3 = arr.records.location[0].weatherElement[0].time[2].startTime.substr(5,8).replace("-","/") + "時";
 			//主時間 Day 2, 3, 4 時間資料 #date, #day2, day3, day4
 			$("#city").text(city_name);
 			$("#date").text(time_1.substr(0,5));
@@ -36,11 +37,10 @@ $(document).ready(function() {
 			$("#day3").text(time_2);
 			$("#day4").text(time_3);
 			
-			//天氣概況 #weather-description
-			var weather_1 = arr.records.location[0].weatherElement[0].time[0].parameter.parameterName;
-			var weather_value_1 = arr.records.location[0].weatherElement[0].time[0].parameter.parameterValue;
-			var weather_value_2 = arr.records.location[0].weatherElement[0].time[1].parameter.parameterValue;
-			var weather_value_3 = arr.records.location[0].weatherElement[0].time[2].parameter.parameterValue;
+			//天氣現象 #weather-description
+			
+			var weather_value_1 = arr.records.locations[0].location[0].weatherElement[1].time[0].starttime;
+			var weather_value_2 = arr.records.locations[0].location[0].weatherElement[1].time[0].elementValue[0].value;
 			$("#weather-description").text(weather_1);
 			//skycons.set("weather-icon", icon); https://github.com/darkskyapp/skycons {"clear-day", "clear-night", "partly-cloudy-day", "partly-cloudy-night", "cloudy", "rain", "sleet", "snow", "wind", "fog"}
 			//Use dictionary to map weather icon (ForecastElement.PDF)
@@ -54,26 +54,23 @@ $(document).ready(function() {
 			skycons.set("weather-icon-day4", weather_dict[weather_value_3]);
 			skycons.play();
 			
-			//舒適度 #feels-like
-			var fl_1 = arr.records.location[0].weatherElement[3].time[0].parameter.parameterName;
-			$("#feels-like").text(fl_1);
 			
-			//溫度 #temp #day2-high-low, day3-high-low, day4-high-low
-			var minT_1 = arr.records.location[0].weatherElement[2].time[0].parameter.parameterName;
-			var minT_2 = arr.records.location[0].weatherElement[2].time[1].parameter.parameterName;
-			var minT_3 = arr.records.location[0].weatherElement[2].time[2].parameter.parameterName;
-			var maxT_1 = arr.records.location[0].weatherElement[4].time[0].parameter.parameterName;
-			var maxT_2 = arr.records.location[0].weatherElement[4].time[1].parameter.parameterName;
-			var maxT_3 = arr.records.location[0].weatherElement[4].time[2].parameter.parameterName;
+			//潮汐 #temp #day2-high-low, day3-high-low, day4-high-low
+			var minT_1 = arr.records.location[0].validTime[0].weatherElement[2].time[0].parameter.parameterName;
+			var minT_2 = arr.records.location[0].validTime[0].weatherElement[2].time[1].parameter.parameterName;
+			var minT_3 = arr.records.location[0].validTime[0].weatherElement[2].time[2].parameter.parameterName;
+			var maxT_1 = arr.records.location[0].validTime[0].weatherElement[4].time[0].parameter.parameterName;
+			var maxT_2 = arr.records.location[0].validTime[0].weatherElement[4].time[1].parameter.parameterName;
+			var maxT_3 = arr.records.location[0].validTime[0].weatherElement[4].time[2].parameter.parameterName;
 			$("#temp").text(Math.round((Number(minT_1) + Number(maxT_1)) / 2) + "°");
-			$("#day2-high-low").text(minT_1 + "~" + maxT_1 + "°C");
-			$("#day3-high-low").text(minT_2 + "~" + maxT_2 + "°C");
-			$("#day4-high-low").text(minT_3 + "~" + maxT_3 + "°C");
+			$("#day2-high-low").text(minT_1);
+			$("#day3-high-low").text(minT_2);
+			$("#day4-high-low").text(minT_3);
 			
 			//降雨機率 #day2-precip, day3-precip, day4-precip
-			var rain_1 = arr.records.location[0].weatherElement[1].time[0].parameter.parameterName;
-			var rain_2 = arr.records.location[0].weatherElement[1].time[1].parameter.parameterName;
-			var rain_3 = arr.records.location[0].weatherElement[1].time[2].parameter.parameterName;
+			var rain_1 = arr.records.location[0].validTime[0].weatherElement[1].time[0].parameter.parameterName;
+			var rain_2 = arr.records.location[0].validTime[0].weatherElement[1].time[1].parameter.parameterName;
+			var rain_3 = arr.records.location[0].validTime[0].weatherElement[1].time[2].parameter.parameterName;
 			$("#day2-precip").text(rain_1 + "%");
 			$("#day3-precip").text(rain_2 + "%");
 			$("#day4-precip").text(rain_3 + "%");
@@ -85,6 +82,7 @@ $(document).ready(function() {
 			// console.log("Get Taiwan weather complete.");
 		});
 	}
+	
 	
 	//華氏攝氏轉換 Celsius & Fahrenheit conversion function
 	function C2F(c_degree) {
